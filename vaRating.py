@@ -1,15 +1,35 @@
-def GetRating(ratings):
-    dblRemaining = 100
-    dblSubtotal = 0
+def GetRating(ratings: list) -> float:
+    remaining = 100
+    subtotal = 0
     for i in ratings[0:]:
-        dblSubtotal += dblRemaining * (i / 100)
-        dblRemaining -= dblRemaining * (i / 100)
-    return dblSubtotal
+        subtotal += remaining * (i / 100)
+        remaining -= remaining * (i / 100)
+    return subtotal
 
 
 def GetPayment(
-    rating, marStatus, numChildUnder18, numChildOver18=0, numParent=0, spouseAid=False
-):
+    rating: int,
+    marStatus: str,
+    under18: int,
+    over18: int = 0,
+    depParent: int = 0,
+    spouseAid: bool = False,
+) -> float:
+    """
+    Returns the estimated monthly disability payment.
+
+        Parameters:
+            rating (int): Combined disability rating as an integer
+            marStatus (str): Current marital status ("M" or "S")
+            under18 (int): Number of dependents under 18 years old
+            over18 (int): Number of dependents over 18 years old
+            depParent (int): Number of dependent parents (0, 1, or 2)
+            spouseAid (bool): Does the spouse require Aid and Attendance (True, False)
+
+        Returns:
+            output (float): Dollar amount of estimated monthly payment
+    """
+
     payTableNoChild = [
         [467.39, 522.39, 566.39, 610.39, 511.39, 555.39],
         [673.28, 747.28, 806.28, 865.28, 732.28, 791.28],
@@ -47,11 +67,9 @@ def GetPayment(
         case 10:
             payment = 152.64
             return payment
-            quit()
         case 20:
             payment = 301.74
             return payment
-            quit()
         case 30:
             i = 0
         case 40:
@@ -69,38 +87,38 @@ def GetPayment(
         case 100:
             i = 7
 
-    if numChildUnder18 > 0 or numChildOver18 > 0:
+    if under18 > 0 or over18 > 0:
         chart = payTableWithChild
     else:
         chart = payTableNoChild
 
     if marStatus.lower() == "s":
-        if numParent == 0:
+        if depParent == 0:
             j = 0
-        elif numParent == 1:
+        elif depParent == 1:
             j = 4
-        elif numParent >= 2:
+        elif depParent >= 2:
             j = 5
     elif marStatus.lower() == "m":
-        if numParent == 0:
+        if depParent == 0:
             j = 1
-        elif numParent == 1:
+        elif depParent == 1:
             j = 2
-        elif numParent >= 2:
+        elif depParent >= 2:
             j = 3
 
-    under18multiplier = numChildUnder18 - 1
-    over18multiplier = numChildOver18 - 1
+    under18multiplier = under18 - 1
+    over18multiplier = over18 - 1
 
-    dblOutput = chart[i][j]
+    output = chart[i][j]
 
     if spouseAid:
-        dblOutput += dependentPay[i][2]
+        output += dependentPay[i][2]
 
     if under18multiplier > 0:
-        dblOutput += dependentPay[i][0] * under18multiplier
+        output += dependentPay[i][0] * under18multiplier
 
     if over18multiplier > 0:
-        dblOutput += dependentPay[i][1] * over18multiplier
+        output += dependentPay[i][1] * over18multiplier
 
-    return dblOutput
+    return output
