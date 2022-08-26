@@ -11,7 +11,7 @@ focusColor = ("black", "DeepSkyBlue2")
 noFocusColor = (sg.theme_button_color_text(), sg.theme_button_color_background())
 
 
-def frmVACalculator():
+def windowVACalculator():
 
     layout = [
         [
@@ -114,11 +114,11 @@ blRightLeg = []
 blLeftArm = []
 blRightArm = []
 otherRating = []
-strDisabilities = ""
+disabilities = ""
 paymentEnabled = False
 
 
-window = frmVACalculator()
+window = windowVACalculator()
 
 
 def setupPayment():
@@ -163,8 +163,8 @@ while True:
         blLeftArm = []
         blRightArm = []
         otherRating = []
-        strDisabilities = ""
-        window["Disabilities"].update(strDisabilities)
+        disabilities = ""
+        window["Disabilities"].update(disabilities)
         window["Left Leg"].update(button_color=noFocusColor)
         window["Right Leg"].update(button_color=noFocusColor)
         window["Left Arm"].update(button_color=noFocusColor)
@@ -174,90 +174,79 @@ while True:
     if event in ("10%", "20%", "30%", "40%", "50%", "60%", "70%", "80%", "90%", "100%"):
         match event:
             case "10%":
-                intRating = 10
+                rating = 10
             case "20%":
-                intRating = 20
+                rating = 20
             case "30%":
-                intRating = 30
+                rating = 30
             case "40%":
-                intRating = 40
+                rating = 40
             case "50%":
-                intRating = 50
+                rating = 50
             case "60%":
-                intRating = 60
+                rating = 60
             case "70%":
-                intRating = 70
+                rating = 70
             case "80%":
-                intRating = 80
+                rating = 80
             case "90%":
-                intRating = 90
+                rating = 90
             case "100%":
-                intRating = 100
-        strDisabilities += "(" + str(intRating) + "%"
+                rating = 100
+        disabilities += "(" + str(rating) + "%"
 
         match hasFocus:
             case "Left Leg":
-                blLeftLeg.append(intRating)
-                strDisabilities += " LL) "
+                blLeftLeg.append(rating)
+                disabilities += " LL) "
             case "Right Leg":
-                blRightLeg.append(intRating)
-                strDisabilities += " RL) "
+                blRightLeg.append(rating)
+                disabilities += " RL) "
             case "Left Arm":
-                blLeftArm.append(intRating)
-                strDisabilities += " LA) "
+                blLeftArm.append(rating)
+                disabilities += " LA) "
             case "Right Arm":
-                blRightArm.append(intRating)
-                strDisabilities += " RA) "
+                blRightArm.append(rating)
+                disabilities += " RA) "
             case "Other":
-                otherRating.append(intRating)
-                strDisabilities += ") "
-        window["Disabilities"].update(strDisabilities)
+                otherRating.append(rating)
+                disabilities += ") "
+        window["Disabilities"].update(disabilities)
 
     if event == "Reset":
         window.close()
-        window = frmVACalculator()
+        window = windowVACalculator()
         hasFocus = "Other"
         blLeftLeg = []
         blRightLeg = []
         blLeftArm = []
         blRightArm = []
         otherRating = []
-        strDisabilities = ""
+        disabilities = ""
         paymentEnabled = False
 
     if event == "Get Rating":
-        bilateralRating = []
-        legRating = []
-        armRating = []
-        combinedRating = []
         bilateralFactor = 0
-        for i in range(0, len(blLeftLeg)):
-            legRating.append(blLeftLeg[i])
+        bilateralRating = []
+        legRating = [blLeftLeg[i] for i in range(0, len(blLeftLeg))]
         for i in range(0, len(blRightLeg)):
             legRating.append(blRightLeg[i])
-        for i in range(0, len(blLeftArm)):
-            armRating.append(blLeftArm[i])
+        armRating = [blLeftArm[i] for i in range(0, len(blLeftArm))]
         for i in range(0, len(blRightArm)):
             armRating.append(blRightArm[i])
 
-        for i in range(0, len(legRating)):
-            combinedRating.append(legRating[i])
+        combinedRating = [legRating[i] for i in range(0, len(legRating))]
         for i in range(0, len(armRating)):
             combinedRating.append(armRating[i])
         for i in range(0, len(otherRating)):
             combinedRating.append(otherRating[i])
 
-        # rating = va.GetRating(otherRating)
-        # window["Rating"].update(rating)
-
         if len(blLeftLeg) > 0 and len(blRightLeg) > 0:
-            for i in range(0, len(blLeftLeg)):
-                bilateralRating.append(blLeftLeg[i])
+            bilateralRating = [blLeftLeg[i] for i in range(0, len(blLeftLeg))]
             for i in range(0, len(blRightLeg)):
                 bilateralRating.append(blRightLeg[i])
         if len(blLeftArm) > 0 and len(blRightArm) > 0:
-            for i in range(0, len(blLeftArm)):
-                bilateralRating.append(blLeftArm[i])
+            bilateralRating = [blLeftArm[i] for i in range(0, len(blLeftArm))]
             for i in range(0, len(blRightArm)):
                 bilateralRating.append(blRightArm[i])
         if len(bilateralRating) > 0:
