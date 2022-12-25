@@ -12,7 +12,10 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
+        # Configure Window
         self.title("VA Disability Calculator")
+
+        # Initialize Values
         self.hasFocus = "btnOther"
         self.focusColor = ["#3a7ebf", "#0088FF"]
         self.noFocusColor = ["#3a7ebf", "#1f538d"]
@@ -22,6 +25,7 @@ class App(customtkinter.CTk):
         self.rightLeg = []
         self.other = []
 
+        # Extremity Frame
         self.bilateralFrame = customtkinter.CTkFrame(master=self, corner_radius=10)
         self.bilateralFrame.pack(pady=10, padx=20, expand=True)
 
@@ -53,6 +57,7 @@ class App(customtkinter.CTk):
         )
         self.btnOther.grid(row=0, column=4, pady=12, padx=10)
 
+        # Percentage Frame
         self.percentageFrame = customtkinter.CTkFrame(master=self, corner_radius=10)
         self.percentageFrame.pack(pady=10, padx=20, expand=True)
 
@@ -106,6 +111,7 @@ class App(customtkinter.CTk):
         )
         self.btn100.grid(row=1, column=4, pady=12, padx=10)
 
+        # Demographics Frame
         self.demographicsFrame = customtkinter.CTkFrame(master=self, corner_radius=10)
         self.demographicsFrame.pack(pady=10, padx=20, expand=True)
 
@@ -167,6 +173,7 @@ class App(customtkinter.CTk):
         )
         self.spouseAid.grid(row=2, column=3, columnspan=2, pady=12, padx=10)
 
+        # Ratings Frame
         self.ratingsFrame = customtkinter.CTkFrame(master=self, corner_radius=10)
         self.ratingsFrame.pack(pady=10, padx=20, expand=True)
 
@@ -191,7 +198,16 @@ class App(customtkinter.CTk):
         )
         self.vaPayment.grid(row=4, column=0, columnspan=5, pady=12, padx=10)
 
-    def setButtonColor(self, btn):
+    def setButtonColor(self, btn: str) -> None:
+        """
+        Highlights the focused extremity area.
+
+        Parameters:
+        btn (str): Button to highlight
+
+        Returns:
+        None
+        """
         self.btnLeftLeg.configure(
             fg_color=self.focusColor if btn == "btnLeftLeg" else self.noFocusColor
         )
@@ -209,28 +225,46 @@ class App(customtkinter.CTk):
         )
 
     def ll(self):
+        # Left Leg
         self.setButtonColor("btnLeftLeg")
         self.hasFocus = "btnLeftLeg"
 
     def rl(self):
+        # Right Leg
         self.setButtonColor("btnRightLeg")
         self.hasFocus = "btnRightLeg"
 
     def la(self):
+        # Left Arm
         self.setButtonColor("btnLeftArm")
         self.hasFocus = "btnLeftArm"
 
     def ra(self):
+        # Right Arm
         self.setButtonColor("btnRightArm")
         self.hasFocus = "btnRightArm"
 
     def o(self):
+        # Other
         self.setButtonColor("btnOther")
         self.hasFocus = "btnOther"
 
-    def setPct(self, percentage):
+    def setPct(self, percentage: int) -> None:
+        """
+        Calculates the VA Rating and Payment and displays both
+        on the window.
+
+        Parameters:
+        percentage (str): Individual rating selected
+
+        Returns:
+        None
+        """
+        # Initialize Bilateral Factors
         self.legBF = 0
         self.armBF = 0
+
+        # Append Percentages
         if percentage != 0:
             match self.hasFocus:
                 case "btnLeftLeg":
@@ -243,12 +277,18 @@ class App(customtkinter.CTk):
                     self.rightArm.append(percentage)
                 case "btnOther":
                     self.other.append(percentage)
+
+        # Compile Leg and Arm Percentages
         self.compileLegRating(self.leftLeg, self.rightLeg)
         self.compileArmRating(self.leftArm, self.rightArm)
+
+        # Calculate Bilateral Factors
         if len(self.leftLeg) > 0 and len(self.rightLeg) > 0:
             self.legBF = va.GetRating(self.legRating) * 0.1
         if len(self.leftArm) > 0 and len(self.rightArm) > 0:
             self.armBF = va.GetRating(self.armRating) * 0.1
+
+        # Initalize and Compile Ratings into a Single List    
         totalRating = []
         for a in range(len(self.legRating)):
             totalRating.append(self.legRating[a])
@@ -258,18 +298,25 @@ class App(customtkinter.CTk):
         totalRating.append(self.armBF)
         for c in range(len(self.other)):
             totalRating.append(self.other[c])
+        # Update the Displayed Rating List
         self.ratingList.configure(
             text=str(self.legRating + self.armRating + self.other)
             + " Bilateral Factor: "
             + str(round(self.legBF + self.armBF, 1))
             + "%"
         )
+        # Find the Rounded Rating
         roundedRating = round(math.floor(va.GetRating(totalRating)) / 10) * 10
+        # Display the VA Rating
         self.rating.configure(text="VA Rating: " + str(roundedRating) + "%")
+        
+        # Convert Spouse Aid Entry to Boolean
         if self.spouseAid.get() == "Y":
             aaBool = True
         else:
             aaBool = False
+        
+        # Get the VA Payment from the Entered Data
         payment = va.GetPayment(
             roundedRating,
             self.maritalStatus.get(),
@@ -278,8 +325,10 @@ class App(customtkinter.CTk):
             int(self.depParent.get()),
             aaBool,
         )
+        # Update the Displayed VA Payment
         self.vaPayment.configure(text=payment)
 
+    # Percentage Buttons
     def ten(self):
         self.setPct(10)
 
@@ -310,12 +359,14 @@ class App(customtkinter.CTk):
     def hundred(self):
         self.setPct(100)
 
+    # Force Calculation
     def updateRating(self, value):
         try:
             self.setPct(0)
         except UnboundLocalError:
             return
 
+    # Compile Leg Ratings into a Single List
     def compileLegRating(self, ll, rl):
         self.legRating = []
         for i in range(len(ll)):
@@ -323,6 +374,7 @@ class App(customtkinter.CTk):
         for j in range(len(rl)):
             self.legRating.append(rl[j])
 
+    # Compile Arm Ratings into a Single List
     def compileArmRating(self, la, ra):
         self.armRating = []
         for i in range(len(la)):
@@ -330,7 +382,7 @@ class App(customtkinter.CTk):
         for j in range(len(ra)):
             self.armRating.append(ra[j])
 
-
+# Execute
 if __name__ == "__main__":
     app = App()
     app.mainloop()
