@@ -288,7 +288,7 @@ class App(customtkinter.CTk):
         if len(self.leftArm) > 0 and len(self.rightArm) > 0:
             self.armBF = va.GetRating(self.armRating) * 0.1
 
-        # Initalize and Compile Ratings into a Single List    
+        # Initalize and Compile Ratings into a Single List
         totalRating = []
         for a in range(len(self.legRating)):
             totalRating.append(self.legRating[a])
@@ -309,13 +309,13 @@ class App(customtkinter.CTk):
         roundedRating = round(math.floor(va.GetRating(totalRating)) / 10) * 10
         # Display the VA Rating
         self.rating.configure(text="VA Rating: " + str(roundedRating) + "%")
-        
+
         # Convert Spouse Aid Entry to Boolean
         if self.spouseAid.get() == "Y":
             aaBool = True
         else:
             aaBool = False
-        
+
         # Get the VA Payment from the Entered Data
         payment = va.GetPayment(
             roundedRating,
@@ -326,7 +326,7 @@ class App(customtkinter.CTk):
             aaBool,
         )
         # Update the Displayed VA Payment
-        self.vaPayment.configure(text=payment)
+        self.vaPayment.configure(text="${:,.2f}".format(payment))
 
     # Percentage Buttons
     def ten(self):
@@ -381,6 +381,7 @@ class App(customtkinter.CTk):
             self.armRating.append(la[i])
         for j in range(len(ra)):
             self.armRating.append(ra[j])
+
 
 # Execute
 if __name__ == "__main__":
